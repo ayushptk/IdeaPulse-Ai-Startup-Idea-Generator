@@ -165,8 +165,8 @@ function ToggleRow({
   onChange: (v: boolean) => void;
 }) {
   return (
-    <div className="flex items-start justify-between gap-6 py-4 border-b border-white/[0.05] last:border-b-0">
-      <div>
+    <div className="flex items-start justify-between gap-4 sm:gap-6 py-4 border-b border-white/[0.05] last:border-b-0">
+      <div className="min-w-0 pr-2">
         <p className="text-sm text-slate-200">{label}</p>
         {sub && <p className="text-xs text-slate-600 mt-0.5">{sub}</p>}
       </div>
@@ -745,7 +745,7 @@ export default function SettingsPage() {
 
         {}
         <div className="flex-1 min-w-0">
-          <div className="bg-[#111113] border border-white/[0.06] rounded-2xl p-7 lg:p-9">
+          <div className="bg-[#111113] border border-white/[0.06] rounded-2xl p-5 sm:p-7 lg:p-9">
             {active === "profile"       && <ProfileTab />}
             {active === "notifications" && <NotificationsTab />}
             {active === "appearance"    && <FeaturesTab />}

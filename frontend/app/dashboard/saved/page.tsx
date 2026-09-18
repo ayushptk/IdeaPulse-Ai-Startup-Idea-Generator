@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import {
   Bookmark,
@@ -167,7 +168,7 @@ function SavedCardList({
   return (
     <div
       onClick={onClick}
-      className="group flex items-start gap-5 px-5 py-4 border-b border-white/[0.06] cursor-pointer hover:bg-white/[0.02] transition-colors last:border-b-0"
+      className="group flex items-start gap-4 sm:gap-5 px-4 sm:px-5 py-3 sm:py-4 border-b border-white/[0.06] cursor-pointer hover:bg-white/[0.02] transition-colors last:border-b-0 min-w-0"
     >
       <ScoreRing score={idea.score || 0} />
 
@@ -258,9 +259,9 @@ function DetailModal({
         className="bg-[#111113] border border-white/10 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl relative"
         onClick={(e) => e.stopPropagation()}
       >
-        {}
-        <div className="flex items-center justify-between p-5 border-b border-white/[0.06]">
-          <div className="flex items-center gap-2">
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 sm:p-5 border-b border-white/[0.06] flex-wrap gap-3">
+          <div className="flex items-center gap-2 flex-wrap">
             <span className={`text-[11px] font-bold tracking-wider uppercase px-2.5 py-1 rounded-md border ${meta.badge}`}>
               {meta.label}
             </span>
@@ -291,7 +292,7 @@ function DetailModal({
           </div>
         </div>
 
-        <div className="p-7 space-y-6">
+        <div className="p-5 sm:p-7 space-y-6">
           <div>
             <h2 className="text-2xl font-bold text-white mb-1.5 leading-tight">
               {idea.idea_name || idea.idea || "SaaS Idea"}
@@ -391,6 +392,7 @@ function DetailModal({
 }
 
 export default function SavedIdeasPage() {
+  const { status } = useSession();
   const { savedIdeas, unsaveIdea } = useSavedIdeas();
   const [query, setQuery] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -452,6 +454,30 @@ export default function SavedIdeasPage() {
             <div key={i} className="h-48 bg-white/[0.05] rounded-2xl border border-white/[0.06]" />
           ))}
         </div>
+      </div>
+    );
+  }
+
+  if (status === "unauthenticated") {
+    return (
+      <div className="flex flex-col items-center justify-center py-28 gap-6 text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="relative">
+          <div className="w-20 h-20 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center">
+            <Bookmark className="w-9 h-9 text-indigo-400" />
+          </div>
+        </div>
+        <div>
+          <h3 className="text-lg font-semibold text-white mb-1.5">Log in to view saved ideas</h3>
+          <p className="text-sm text-slate-500 max-w-xs leading-relaxed">
+            Your saved ideas are securely stored and synced across devices. Please log in to access them.
+          </p>
+        </div>
+        <Link
+          href="/login"
+          className="flex items-center gap-2 px-5 py-2.5 bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-medium rounded-xl transition-colors shadow-lg shadow-indigo-500/20"
+        >
+          Log In
+        </Link>
       </div>
     );
   }

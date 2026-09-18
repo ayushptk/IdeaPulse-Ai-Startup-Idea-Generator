@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { Sparkles, TrendingUp, Clock, Bookmark, ChevronUp, Share2, Compass, Activity, X } from 'lucide-react';
 import { useSavedIdeas, SavedIdea } from '@/hooks/useSavedIdeas';
 
-const _apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+const _apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/v1';
 const API_BASE = _apiUrl.replace(/\/api\/v1\/?$/, '');
 const categories = ['All Ideas', 'Reddit', 'ProductHunt', 'HackerNews', 'LinkedIn', 'IndieHackers'];
 
@@ -327,7 +327,7 @@ export default function Dashboard() {
               <X className="w-5 h-5" />
             </button>
             
-            <div className="p-8 space-y-6">
+            <div className="p-5 sm:p-8 space-y-6">
               <div className="flex gap-2 items-center mb-2">
                 <span className={`text-xs font-bold tracking-wider uppercase px-2.5 py-1 rounded-md border ${PLATFORM_COLORS[selectedIdea.platform?.toLowerCase() || ""] || 'bg-white/5 text-slate-300 border-white/5'}`}>
                   {selectedIdea.platform}

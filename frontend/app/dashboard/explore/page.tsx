@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { useSavedIdeas, SavedIdea } from "@/hooks/useSavedIdeas";
 
-const _apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+const _apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/v1';
 const API_BASE = _apiUrl.replace(/\/api\/v1\/?$/, '');
 
 const PLATFORM_META: Record<string, { label: string; color: string; dot: string }> = {
@@ -98,7 +98,7 @@ function IdeaCardList({ idea, onClick, onBookmark, saved }: { idea: SavedIdea; o
   return (
     <div
       onClick={onClick}
-      className="group flex items-start gap-5 px-5 py-4 border-b border-white/[0.06] cursor-pointer hover:bg-white/[0.02] transition-colors last:border-b-0"
+      className="group flex items-start gap-4 sm:gap-5 px-4 sm:px-5 py-3 sm:py-4 border-b border-white/[0.06] cursor-pointer hover:bg-white/[0.02] transition-colors last:border-b-0 min-w-0"
     >
       <ScoreRing score={idea.score || 0} />
 
@@ -157,7 +157,7 @@ function SkeletonGrid() {
 
 function SkeletonList() {
   return (
-    <div className="flex items-start gap-5 px-5 py-4 border-b border-white/[0.06] animate-pulse">
+    <div className="flex items-start gap-4 sm:gap-5 px-4 sm:px-5 py-3 sm:py-4 border-b border-white/[0.06] animate-pulse">
       <div className="w-10 h-10 rounded-full bg-white/[0.08] shrink-0" />
       <div className="flex-1 space-y-2 pt-1">
         <div className="w-20 h-3 bg-white/[0.08] rounded-full" />
@@ -301,7 +301,7 @@ export default function ExplorePage() {
       </div>
 
       {}
-      <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+      <div className="flex flex-nowrap overflow-x-auto pb-1 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0 gap-2">
         {PLATFORMS.map((p) => (
           <button
             key={p}

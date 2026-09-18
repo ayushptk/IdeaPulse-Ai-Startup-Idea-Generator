@@ -8,9 +8,11 @@ import {
   TrendingUp,
   Bookmark,
   Settings, 
-  LogOut
+  LogOut,
+  X
 } from 'lucide-react';
 import Image from 'next/image';
+import { useSidebar } from '@/hooks/useSidebar';
 
 const navItems = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -22,9 +24,19 @@ const navItems = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const { isOpen, close } = useSidebar();
 
   return (
-    <aside className="hidden md:flex w-72 bg-[#09090b] text-slate-400 flex-col h-screen fixed top-0 left-0 border-r border-white/10 z-20">
+    <>
+      {/* Mobile Backdrop */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden"
+          onClick={close}
+        />
+      )}
+      
+      <aside className={`fixed top-0 left-0 h-screen w-72 bg-[#09090b] text-slate-400 flex flex-col border-r border-white/10 z-50 transition-transform duration-300 ease-in-out md:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
       <div className="h-20 flex items-center px-8 border-b border-white/5">
         <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-lg  flex items-center justify-center shadow-[0_0_15px_rgba(99,102,241,0.4)]">
@@ -34,6 +46,9 @@ export function Sidebar() {
             IdeaForge
           </span>
         </div>
+        <button onClick={close} className="md:hidden ml-auto p-2 text-slate-400 hover:text-white rounded-lg hover:bg-white/5 transition-colors">
+          <X className="w-5 h-5" />
+        </button>
       </div>
       
       <div className="px-6 py-8">
@@ -81,5 +96,6 @@ export function Sidebar() {
         </button>
       </div>
     </aside>
+    </>
   );
 }

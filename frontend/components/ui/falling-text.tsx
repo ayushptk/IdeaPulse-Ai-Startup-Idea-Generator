@@ -112,6 +112,15 @@ export const FallingText: React.FC<FallingTextProps> = ({
     });
 
     const mouse = Mouse.create(containerRef.current);
+    
+    // Prevent Matter.js from stealing scroll/touch events
+    mouse.element.removeEventListener("wheel", mouse.mousewheel);
+    mouse.element.removeEventListener("mousewheel", mouse.mousewheel);
+    mouse.element.removeEventListener("DOMMouseScroll", mouse.mousewheel);
+    mouse.element.removeEventListener("touchmove", mouse.mousemove);
+    mouse.element.removeEventListener("touchstart", mouse.mousedown);
+    mouse.element.removeEventListener("touchend", mouse.mouseup);
+
     const mouseConstraint = MouseConstraint.create(engine, {
       mouse,
       constraint: {

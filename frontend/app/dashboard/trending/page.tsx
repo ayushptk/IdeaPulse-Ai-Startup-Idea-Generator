@@ -44,7 +44,7 @@ function ScoreBadge({ score }: { score: number }) {
 
 function Skeleton() {
   return (
-    <div className="animate-pulse flex items-start gap-5 p-5 border-b border-white/[0.05] last:border-b-0">
+    <div className="animate-pulse flex items-start gap-4 sm:gap-5 p-4 sm:p-5 border-b border-white/[0.05] last:border-b-0">
       <div className="shrink-0 w-8 h-8 rounded-lg bg-white/[0.06]" />
       <div className="flex-1 space-y-2.5 pt-0.5">
         <div className="h-2.5 bg-white/[0.06] rounded-full w-24" />
@@ -70,7 +70,8 @@ export default function TrendingProblemsPage() {
   const [showSort, setShowSort] = useState(false);
 
   useEffect(() => {
-    fetch("http://localhost:8000/api/v1/ideas?limit=30")
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/v1';
+    fetch(`${apiUrl}/ideas?limit=30`)
       .then((r) => r.json())
       .then((data) => {
         let all: SavedIdea[] = [];
@@ -187,8 +188,8 @@ export default function TrendingProblemsPage() {
         </div>
       </div>
 
-      {}
-      <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide mb-8">
+      {/* Platform Filter */}
+      <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide mb-8 -mx-4 px-4 sm:mx-0 sm:px-0 flex-nowrap">
         {PLATFORMS.map((p) => (
           <button
             key={p}
@@ -230,7 +231,7 @@ export default function TrendingProblemsPage() {
               <div
                 key={idea.id || idx}
                 onClick={() => handleClick(idea)}
-                className="group flex items-start gap-5 p-5 border-b border-white/[0.05] last:border-b-0 cursor-pointer hover:bg-white/[0.025] transition-colors"
+                className="group flex items-start gap-4 sm:gap-5 p-4 sm:p-5 border-b border-white/[0.05] last:border-b-0 cursor-pointer hover:bg-white/[0.025] transition-colors min-w-0"
               >
                 {}
                 <div className="shrink-0 w-8 flex flex-col items-center justify-start pt-0.5">

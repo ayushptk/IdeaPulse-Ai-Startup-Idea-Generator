@@ -9,7 +9,8 @@ export function LiveIdeaPreview() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://localhost:8000/api/v1/ideas?limit=1")
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/v1';
+    fetch(`${apiUrl}/ideas?limit=1`)
       .then((res) => res.json())
       .then((data) => {
         let allIdeas: SavedIdea[] = [];

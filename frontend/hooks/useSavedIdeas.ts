@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useCallback } from "react";
-
-const STORAGE_KEY = "ideaforge_saved_ideas";
+import { useState, useCallback, useEffect } from "react";
+import { useSession } from "next-auth/react";
 
 export interface SavedIdea {
   id?: number | string;
@@ -29,63 +28,104 @@ const getIdeaKey = (idea: SavedIdea): string =>
   idea.id ? String(idea.id) : encodeURIComponent(idea.problem?.slice(0, 60) || "unknown");
 
 export function useSavedIdeas() {
-  const [savedIdeas, setSavedIdeas] = useState<SavedIdea[]>(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (raw) return JSON.parse(raw);
-      } catch {
-        
-      }
-    }
-    return [];
-  });
+  const { data: session, status } = useSession();
+  const [savedIdeas, setSavedIdeas] = useState<SavedIdea[]>([]);
+  const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
+  const [isLoading, setIsLoading] = useState(false);
 
-  const [savedIds, setSavedIds] = useState<Set<string>>(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (raw) {
-          const parsed: SavedIdea[] = JSON.parse(raw);
-          return new Set(parsed.map((idea) => getIdeaKey(idea)));
-        }
-      } catch {
-        
+  const fetchSavedIdeas = useCallback(async () => {
+    if (status !== "authenticated") return;
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/saved-ideas");
+      if (res.ok) {
+        const data: SavedIdea[] = await res.json();
+        setSavedIdeas(data);
+        setSavedIds(new Set(data.map(getIdeaKey)));
       }
+    } catch (e) {
+      console.error("Failed to fetch saved ideas", e);
+    } finally {
+      setIsLoading(false);
     }
-    return new Set();
-  });
+  }, [status]);
 
-  const saveIdea = useCallback((idea: SavedIdea) => {
+  useEffect(() => {
+    if (status === "authenticated") {
+      fetchSavedIdeas();
+    } else {
+      setSavedIdeas([]);
+      setSavedIds(new Set());
+    }
+  }, [status, fetchSavedIdeas]);
+
+  const saveIdea = useCallback(async (idea: SavedIdea) => {
+    if (status !== "authenticated") {
+      alert("Please log in to save ideas.");
+      return;
+    }
+    const key = getIdeaKey(idea);
+    
+    // Optimistic update
     setSavedIdeas((prev) => {
-      const key = getIdeaKey(idea);
       if (prev.some((s) => getIdeaKey(s) === key)) return prev;
-      const next = [{ ...idea, savedAt: new Date().toISOString() }, ...prev];
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-      return next;
+      return [{ ...idea, savedAt: new Date().toISOString() }, ...prev];
     });
     setSavedIds((prev) => {
-      const key = getIdeaKey(idea);
       const next = new Set(prev);
       next.add(key);
       return next;
     });
-  }, []);
 
-  const unsaveIdea = useCallback((idea: SavedIdea) => {
+    try {
+      const res = await fetch("/api/saved-ideas", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          idea_key: key,
+          idea_data: idea,
+        }),
+      });
+      if (!res.ok) throw new Error("Failed to save");
+    } catch (e) {
+      // Revert optimistic update
+      setSavedIdeas((prev) => prev.filter((s) => getIdeaKey(s) !== key));
+      setSavedIds((prev) => {
+        const next = new Set(prev);
+        next.delete(key);
+        return next;
+      });
+    }
+  }, [status]);
+
+  const unsaveIdea = useCallback(async (idea: SavedIdea) => {
+    if (status !== "authenticated") return;
     const key = getIdeaKey(idea);
-    setSavedIdeas((prev) => {
-      const next = prev.filter((s) => getIdeaKey(s) !== key);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-      return next;
-    });
+    
+    // Optimistic update
+    const previousIdeas = savedIdeas;
+    const previousIds = savedIds;
+    
+    setSavedIdeas((prev) => prev.filter((s) => getIdeaKey(s) !== key));
     setSavedIds((prev) => {
-      const key = getIdeaKey(idea);
       const next = new Set(prev);
       next.delete(key);
       return next;
     });
-  }, []);
+
+    try {
+      const res = await fetch("/api/saved-ideas", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ idea_key: key }),
+      });
+      if (!res.ok) throw new Error("Failed to unsave");
+    } catch (e) {
+      // Revert optimistic update
+      setSavedIdeas(previousIdeas);
+      setSavedIds(previousIds);
+    }
+  }, [status, savedIdeas, savedIds]);
 
   const toggleSave = useCallback(
     (idea: SavedIdea) => {
@@ -104,5 +144,5 @@ export function useSavedIdeas() {
     [savedIds]
   );
 
-  return { savedIdeas, savedIds, saveIdea, unsaveIdea, toggleSave, isSaved };
+  return { savedIdeas, savedIds, saveIdea, unsaveIdea, toggleSave, isSaved, isLoading };
 }

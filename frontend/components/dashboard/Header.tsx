@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { Search, Bell, Menu, Check, Trash2, Clock, Info, Lightbulb, AlertCircle, X } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSidebar } from '@/hooks/useSidebar';
 
 interface Notification {
   id: string;
@@ -18,8 +19,10 @@ interface Notification {
 export function Header() {
   const { data: session } = useSession();
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const { toggle } = useSidebar();
   
   const firstNameRaw = session?.user?.name?.split(' ')[0] || 'User';
   const firstName = firstNameRaw.charAt(0).toUpperCase() + firstNameRaw.slice(1);
@@ -66,9 +69,9 @@ export function Header() {
   };
 
   return (
-    <header className="h-20 bg-[#09090b]/80 backdrop-blur-md border-b border-white/5 flex items-center justify-between px-6 md:px-10 sticky top-0 z-10 transition-all">
-      <div className="flex items-center gap-4">
-        <button className="md:hidden text-slate-400 hover:text-white transition-colors">
+    <header className="h-20 bg-[#09090b]/80 backdrop-blur-md border-b border-white/5 flex items-center justify-between px-4 sm:px-6 md:px-10 sticky top-0 z-10 transition-all">
+      <div className={`flex items-center gap-4 ${isSearchOpen ? 'hidden md:flex' : 'flex'}`}>
+        <button onClick={toggle} className="md:hidden text-slate-400 hover:text-white transition-colors p-1">
           <Menu className="w-6 h-6" />
         </button>
         <div className="flex-1 max-w-xl hidden md:block">
@@ -85,9 +88,35 @@ export function Header() {
         </div>
       </div>
 
-      <div className="flex items-center gap-5">
+      {isSearchOpen && (
+        <div className="flex-1 flex md:hidden items-center gap-2 pr-4 w-full animate-in fade-in zoom-in-95 duration-200">
+          <div className="relative flex-1">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <Search className="h-4 w-4 text-slate-500" />
+            </div>
+            <input 
+              type="text" 
+              placeholder="Search ideas..." 
+              autoFocus
+              className="block w-full pl-9 pr-4 py-2 bg-white/5 border border-white/5 rounded-lg text-sm text-white placeholder-slate-500 focus:border-indigo-500/50 focus:bg-white/10 focus:ring-2 focus:ring-indigo-500/10 transition-all outline-none"
+            />
+          </div>
+          <button onClick={() => setIsSearchOpen(false)} className="p-2 text-slate-400 hover:text-white">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+      )}
+
+      <div className={`flex items-center gap-3 sm:gap-5 ${isSearchOpen ? 'hidden md:flex' : 'flex'}`}>
+        <button 
+          onClick={() => setIsSearchOpen(true)}
+          className="md:hidden p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-full transition-colors"
+        >
+          <Search className="w-5 h-5" />
+        </button>
+        
         <div className="relative" ref={dropdownRef}>
-          <button 
+          <button  
             onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
             className={`relative p-2 rounded-full transition-all duration-200 ${
               isNotificationsOpen ? 'bg-indigo-500/10 text-indigo-400' : 'text-slate-400 hover:text-white hover:bg-white/5'

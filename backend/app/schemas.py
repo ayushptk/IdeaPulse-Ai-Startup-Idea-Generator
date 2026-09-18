@@ -6,7 +6,7 @@ Strict typing ensures data integrity across the entire pipeline.
 import datetime
 from typing import List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, EmailStr
 
 class NormalizedPost(BaseModel):
     """
@@ -97,3 +97,12 @@ class SchedulerStatusResponse(BaseModel):
     countdown_seconds: int = 0
     cron_schedule: str = ""
 
+
+class SaveIdeaRequest(BaseModel):
+    email: EmailStr
+    idea_key: str
+    idea_data: dict
+
+class DeleteSavedIdeaRequest(BaseModel):
+    email: EmailStr
+    idea_key: str

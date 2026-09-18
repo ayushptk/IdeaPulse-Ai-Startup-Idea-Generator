@@ -92,7 +92,8 @@ export default function TrendingDetailPage() {
     }, 0);
     if (!idea) {
       
-      fetch("http://localhost:8000/api/v1/ideas?limit=50")
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/v1';
+      fetch(`${apiUrl}/ideas?limit=50`)
         .then((r) => r.json())
         .then((data) => {
           let all: SavedIdea[] = [];

@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Clock, Zap, RefreshCw, CheckCircle, AlertCircle } from "lucide-react";
 
-const _apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+const _apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/v1';
 const API_BASE = _apiUrl.replace(/\/api\/v1\/?$/, '');
 
 interface SchedulerStatus {
