@@ -113,7 +113,7 @@ export default function Dashboard() {
   const handleLiveSync = async () => {
     setLoading(true);
     try {
-      await fetch(`${API_BASE}/api/v1/pipelines/run-all`, { method: 'POST' });
+      await fetch('/api/pipelines/run-all', { method: 'POST' });
       fetchIdeas();
     } catch {
       setLoading(false);

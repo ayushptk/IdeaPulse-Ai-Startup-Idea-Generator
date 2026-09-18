@@ -13,6 +13,10 @@ class Settings(BaseSettings):
     APP_VERSION: str = "1.0.0"
     DEBUG: bool = False
 
+    # Security
+    INTERNAL_API_KEY: str = ""
+    ALLOWED_ORIGINS: str = "http://localhost:3000"
+
     DATABASE_URL: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/ideaforge"
 
     GEMINI_API_KEY: str = ""

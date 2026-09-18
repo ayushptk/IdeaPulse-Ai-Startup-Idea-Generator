@@ -83,9 +83,14 @@ const SignupPage: React.FC = () => {
                   }
                 } else {
                   const data = await res.json();
-                  toast.error(data.detail || "Registration failed");
+                  if (Array.isArray(data.detail)) {
+                    toast.error(data.detail[0].msg || "Registration failed");
+                  } else {
+                    toast.error(data.detail || "Registration failed");
+                  }
                 }
-              } catch {
+              } catch (error) {
+                console.error("Signup error:", error);
                 toast.error("An error occurred. Please try again.");
               } finally {
                 setIsLoading(false);

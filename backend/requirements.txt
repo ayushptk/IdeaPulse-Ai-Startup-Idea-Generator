@@ -2,7 +2,10 @@
 fastapi
 uvicorn[standard]
 passlib[bcrypt]
+argon2-cffi
 pydantic[email]
+slowapi
+python-jose[cryptography]
 
 # ── Database ──
 sqlalchemy[asyncio]

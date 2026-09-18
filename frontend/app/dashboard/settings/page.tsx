@@ -183,20 +183,21 @@ function ProfileTab() {
   const [bio, setBio] = useState("");
   const [avatarSeed, setAvatarSeed] = useState(session?.user?.name || "Alex");
   const [saved, setSaved] = useState(false);
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api/v1";
 
   const handleSave = async () => {
     try {
       const avatarUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${avatarSeed}`;
-      
-      const res = await fetch(`${API_URL}/auth/update`, {
+
+      // Call the Next.js server-side proxy — it verifies the session before
+      // forwarding to the backend. This prevents IDOR attacks.
+      const res = await fetch(`/api/auth/update`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          email: session?.user?.email,
           name: name,
           picture: avatarUrl,
-          bio: bio
+          bio: bio,
+          // email is intentionally omitted — the proxy reads it from the session
         })
       });
 

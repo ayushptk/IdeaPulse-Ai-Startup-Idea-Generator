@@ -17,8 +17,12 @@ Run with:
 import logging
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from slowapi.util import get_remote_address
 
 from app.api.routes import router
 from app.config import get_settings
@@ -32,6 +36,10 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 settings = get_settings()
+
+# Global rate limiter — keyed by client IP
+limiter = Limiter(key_func=get_remote_address)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -54,11 +62,16 @@ async def lifespan(app: FastAPI):
     start_scheduler()
     logger.info("✅ Scheduler started")
 
-    yield  
+    yield
 
     stop_scheduler()
     await close_db()
     logger.info("👋 Shutdown complete")
+
+
+# Enable interactive docs
+_docs_url = "/docs"
+_redoc_url = "/redoc"
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -68,20 +81,29 @@ app = FastAPI(
         "Product Hunt, Hacker News, LinkedIn, and Indie Hackers — "
         "then generates actionable SaaS product ideas."
     ),
-    docs_url="/docs",
-    redoc_url="/redoc",
+    docs_url=_docs_url,
+    redoc_url=_redoc_url,
     lifespan=lifespan,
 )
 
+# ── Rate limiting ────────────────────────────────────────────────────────────
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)  # type: ignore[arg-type]
+
+# ── CORS ─────────────────────────────────────────────────────────────────────
+# Parse comma-separated allowed origins from env  (e.g. "http://localhost:3000,https://prod.com")
+_origins = [o.strip() for o in settings.ALLOWED_ORIGINS.split(",") if o.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  
+    allow_origins=_origins,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "X-API-Key"],
 )
 
 app.include_router(router, prefix="/api/v1")
+
 
 @app.get("/", tags=["System"])
 async def root():
@@ -89,6 +111,6 @@ async def root():
     return {
         "name": settings.APP_NAME,
         "version": settings.APP_VERSION,
-        "docs": "/docs",
         "api": "/api/v1",
     }
+

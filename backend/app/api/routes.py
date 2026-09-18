@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import get_settings
 from app.core.ai_service import extract_linkedin_founder_ideas
+from app.core.security import require_api_key
 from app.database.db import get_db
 from app.models.idea_model import Idea
 from app.pipelines.hn_pipeline import run_hn_pipeline
@@ -249,10 +250,14 @@ async def get_daily_hn_ideas(
     tags=["Ideas"],
     summary="Extract top 3 founder-style SaaS ideas from LinkedIn post text",
 )
-async def extract_linkedin_ideas(payload: LinkedInExtractRequest):
+async def extract_linkedin_ideas(
+    payload: LinkedInExtractRequest,
+    _key: str = Depends(require_api_key),
+):
     """
     Analyze one LinkedIn post with a founder/PMF-focused prompt and
     return exactly the top 3 SaaS opportunities (when available).
+    Protected by X-API-Key to prevent unrestricted Gemini API cost abuse.
     """
     ideas = await extract_linkedin_founder_ideas(payload.post_text)
     if not ideas:
@@ -271,10 +276,11 @@ async def extract_linkedin_ideas(payload: LinkedInExtractRequest):
 async def trigger_pipeline(
     platform: str,
     db: AsyncSession = Depends(get_db),
+    _key: str = Depends(require_api_key),
 ):
     """
     Manually trigger the idea discovery pipeline for a specific platform.
-    Use this for testing or on-demand refreshes.
+    Protected by X-API-Key — prevents unauthenticated Gemini cost abuse.
     """
     resolved = _resolve_platform(platform)
 
@@ -296,12 +302,13 @@ async def trigger_pipeline(
             message=f"Pipeline completed. {ideas_count} new ideas generated.",
         )
     except Exception as e:
-        logger.error(f"Pipeline [{resolved}] failed: {e}")
+        # Log internally with full details; return only a generic message to clients
+        logger.error(f"Pipeline [{resolved}] failed: {e}", exc_info=True)
         return PipelineStatusResponse(
             platform=resolved,
             status="error",
             ideas_generated=0,
-            message=f"Pipeline failed: {str(e)}",
+            message="Pipeline failed. Please try again later.",
         )
 
 @router.post(
@@ -312,10 +319,12 @@ async def trigger_pipeline(
 )
 async def trigger_all_pipelines(
     db: AsyncSession = Depends(get_db),
+    _key: str = Depends(require_api_key),
 ):
     """
     Run all platform pipelines sequentially.
     Returns status for each platform.
+    Protected by X-API-Key — prevents unauthenticated Gemini cost abuse.
     """
     results = []
 
@@ -329,12 +338,13 @@ async def trigger_all_pipelines(
                 message=f"{ideas_count} new ideas generated.",
             ))
         except Exception as e:
-            logger.error(f"Pipeline [{platform_slug}] failed: {e}")
+            # Log internally with full details; return only a generic message to clients
+            logger.error(f"Pipeline [{platform_slug}] failed: {e}", exc_info=True)
             results.append(PipelineStatusResponse(
                 platform=platform_slug,
                 status="error",
                 ideas_generated=0,
-                message=f"Failed: {str(e)}",
+                message="Pipeline failed. Please try again later.",
             ))
 
     return results

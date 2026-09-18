@@ -82,7 +82,7 @@ export default function NextRunCountdown({ onPipelineComplete }: Props) {
   const handleManualRun = async () => {
     setIsRunning(true);
     try {
-      await fetch(`${API_BASE}/api/v1/pipelines/run-all`, { method: "POST" });
+      await fetch(`/api/pipelines/run-all`, { method: "POST" });
       await fetchStatus();
       onPipelineComplete?.();
     } finally {

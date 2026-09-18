@@ -162,7 +162,7 @@ _USER_AGENT = (
     "Chrome/124.0.0.0 Safari/537.36"
 )
 
-_REQUEST_DELAY = 1.5
+_REQUEST_DELAY = 3.0
 
 def _has_problem_signal(text: str) -> bool:
     """
@@ -210,9 +210,18 @@ async def _fetch_endpoint(
         response = await client.get(url, headers=headers)
 
         if response.status_code == 429:
-            retry_after = int(response.headers.get("x-ratelimit-reset", 60))
-            logger.warning(f"Reddit: rate limited on {endpoint.label} (retry after {retry_after}s), skipping")
-            return []
+            retry_after = int(response.headers.get("x-ratelimit-reset", 5))
+            if retry_after > 15:
+                logger.warning(f"Reddit: severe rate limit ({retry_after}s). Aborting further requests.")
+                raise Exception("RateLimitExceeded")
+            
+            logger.warning(f"Reddit: rate limited on {endpoint.label} (retry after {retry_after}s), waiting and retrying...")
+            await asyncio.sleep(retry_after)
+            response = await client.get(url, headers=headers)
+            if response.status_code == 429:
+                logger.warning(f"Reddit: still rate limited after retry on {endpoint.label}, aborting further requests.")
+                raise Exception("RateLimitExceeded")
+        
         if response.status_code == 403:
             logger.warning(f"Reddit: 403 on {endpoint.label} — may be geo-restricted or quarantined")
             return []
@@ -331,7 +340,12 @@ async def fetch_reddit_posts() -> List[NormalizedPost]:
         await _warm_up_session(client)
 
         for i, endpoint in enumerate(REDDIT_ENDPOINTS):
-            raw_children = await _fetch_endpoint(client, endpoint)
+            try:
+                raw_children = await _fetch_endpoint(client, endpoint)
+            except Exception as e:
+                if str(e) == "RateLimitExceeded":
+                    break
+                raw_children = []
 
             keyword_matched = 0
             for child in raw_children:

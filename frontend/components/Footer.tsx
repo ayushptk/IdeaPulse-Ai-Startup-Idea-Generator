@@ -15,7 +15,7 @@ export function Footer() {
           <p className="text-neutral-400 text-sm max-w-sm mb-6">
             Stop guessing. Start building validated ideas. We help developers and founders find ideas people actually want to pay for.
           </p>
-          <div className="text-neutral-500 text-xs">
+          <div className="text-neutral-500 text-xs" suppressHydrationWarning>
             © {new Date().getFullYear()} IdeaForge AI. All rights reserved.
           </div>
         </div>

@@ -2,7 +2,9 @@ import NextAuth, { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api/v1";
+// Use server-only API_URL — not NEXT_PUBLIC — so it is never bundled into the browser
+const API_URL = process.env.API_URL || "http://127.0.0.1:8000/api/v1";
+const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY || "";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -37,8 +39,7 @@ export const authOptions: NextAuthOptions = {
             };
           }
           return null;
-        } catch (e) {
-
+        } catch {
           return null;
         }
       }
@@ -50,7 +51,11 @@ export const authOptions: NextAuthOptions = {
         try {
           const res = await fetch(`${API_URL}/auth/verify`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+              "Content-Type": "application/json",
+              // Server-side call — safe to include internal key here
+              "X-API-Key": INTERNAL_API_KEY,
+            },
             body: JSON.stringify({
               email: user.email,
               name: user.name,
@@ -65,8 +70,7 @@ export const authOptions: NextAuthOptions = {
             return true;
           }
           return false;
-        } catch (error) {
-
+        } catch {
           return false;
         }
       }
@@ -79,12 +83,12 @@ export const authOptions: NextAuthOptions = {
         token.email = user.email;
         token.picture = (user as { picture?: string; image?: string }).picture || user.image;
       }
-      
+
       if (trigger === "update" && session) {
         token.name = session.name || token.name;
         token.picture = session.picture || token.picture;
       }
-      
+
       return token;
     },
     async session({ session, token }) {
@@ -99,6 +103,8 @@ export const authOptions: NextAuthOptions = {
   },
   session: {
     strategy: "jwt",
+    // Reduce session lifetime from the default 30 days to 7 days
+    maxAge: 7 * 24 * 60 * 60,
   },
   pages: {
     signIn: "/login",
@@ -108,3 +114,4 @@ export const authOptions: NextAuthOptions = {
 const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };
+

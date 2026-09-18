@@ -164,7 +164,7 @@ async def generate_ideas(
 
     try:
         
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         response = await loop.run_in_executor(
             None,
             lambda: client.models.generate_content(
@@ -319,7 +319,7 @@ Return ONLY a valid JSON array with exactly these keys per object:
     full_prompt = f"{LINKEDIN_SYSTEM_PROMPT}\n\n{user_prompt}"
 
     try:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         response = await loop.run_in_executor(
             None,
             lambda: client.models.generate_content(

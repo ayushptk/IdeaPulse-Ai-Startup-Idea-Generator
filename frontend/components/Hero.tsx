@@ -2,8 +2,12 @@
 import { motion } from "framer-motion";
 import { ArrowRight, TrendingUp } from "lucide-react";
 import Link from "next/link";
-import { GlobeCdn } from "@/components/ui/cobe-globe-cdn";
+import dynamic from "next/dynamic";
 import { PlatformStrip } from "@/components/PlatformStrip";
+
+const GlobeCdn = dynamic(() => import("@/components/ui/cobe-globe-cdn").then((mod) => mod.GlobeCdn), {
+  ssr: false,
+});
 
 export function Hero() {
   return (
