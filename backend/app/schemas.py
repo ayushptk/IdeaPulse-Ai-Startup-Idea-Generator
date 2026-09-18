@@ -4,7 +4,6 @@ Strict typing ensures data integrity across the entire pipeline.
 """
 
 import datetime
-from typing import List, Optional
 
 from pydantic import BaseModel, EmailStr, Field
 
@@ -18,13 +17,13 @@ class NormalizedPost(BaseModel):
     text: str = Field(..., description="Full text content of the post")
     engagement: int = Field(0, description="Engagement metric (upvotes, likes, etc.)")
     timestamp: str = Field("", description="ISO-8601 timestamp of the post")
-    url: Optional[str] = Field(None, description="Original post URL for reference")
+    url: str | None = Field(None, description="Original post URL for reference")
 
 class ClusterResult(BaseModel):
     """A cluster of related posts grouped by topic similarity."""
     cluster_id: int
     representative_text: str = Field(..., description="Most representative post in the cluster")
-    posts: List[NormalizedPost]
+    posts: list[NormalizedPost]
     avg_engagement: float
 
 class GeneratedIdea(BaseModel):
@@ -35,7 +34,7 @@ class GeneratedIdea(BaseModel):
     problem: str = Field(..., description="The real-world problem identified")
     users: str = Field(..., description="Target user segment")
     idea: str = Field(..., description="Proposed SaaS product concept")
-    features: List[str] = Field(default_factory=list, description="MVP feature list")
+    features: list[str] = Field(default_factory=list, description="MVP feature list")
     monetization: str = Field(..., description="Revenue model suggestion")
     score: float = Field(..., ge=1, le=10, description="Viability score 1–10")
 
@@ -45,7 +44,7 @@ class LinkedInFounderIdea(BaseModel):
     problem: str
     target_customer: str
     solution: str
-    core_features: List[str] = Field(default_factory=list)
+    core_features: list[str] = Field(default_factory=list)
     why_this_will_work: str
     monetization_model: str
     competitor_gap: str
@@ -62,7 +61,7 @@ class IdeaResponse(BaseModel):
     problem: str
     users: str
     idea: str
-    features: List[str]
+    features: list[str]
     monetization: str
     score: float
     created_at: datetime.datetime
@@ -73,7 +72,7 @@ class PlatformIdeasResponse(BaseModel):
     """Wraps the top-N ideas for a given platform."""
     platform: str
     count: int
-    ideas: List[IdeaResponse]
+    ideas: list[IdeaResponse]
 
 class HealthResponse(BaseModel):
     """Health-check response."""
@@ -91,10 +90,10 @@ class PipelineStatusResponse(BaseModel):
 class SchedulerStatusResponse(BaseModel):
     """Live status of the background scheduler."""
     scheduler_running: bool
-    last_run_at: Optional[str] = None
+    last_run_at: str | None = None
     last_run_ideas: int = 0
     last_run_status: str = "never"
-    next_run_at: Optional[str] = None
+    next_run_at: str | None = None
     countdown_seconds: int = 0
     cron_schedule: str = ""
 

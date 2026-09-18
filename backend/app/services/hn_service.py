@@ -11,7 +11,6 @@ Uses official Hacker News Firebase API endpoints:
 
 import logging
 from datetime import datetime, timezone
-from typing import List
 
 import httpx
 
@@ -29,7 +28,7 @@ FEED_ENDPOINTS = (
     "topstories",
 )
 
-async def _fetch_feed_ids(client: httpx.AsyncClient, feed: str) -> List[int]:
+async def _fetch_feed_ids(client: httpx.AsyncClient, feed: str) -> list[int]:
     """Fetch story IDs from a single HN feed endpoint."""
     response = await client.get(f"{HN_BASE_URL}/{feed}.json")
     response.raise_for_status()
@@ -78,12 +77,12 @@ def _parse_item(item: dict) -> NormalizedPost | None:
         url=item_url,
     )
 
-async def fetch_hn_posts() -> List[NormalizedPost]:
+async def fetch_hn_posts() -> list[NormalizedPost]:
     """
     Main entry point — fetches HN stories from official Firebase feeds.
     Mixes new/ask/show/top feeds for broad discovery and normalizes them.
     """
-    posts: List[NormalizedPost] = []
+    posts: list[NormalizedPost] = []
     seen_ids: set[int] = set()
     max_per_feed = max(10, settings.MAX_POSTS_PER_FETCH // len(FEED_ENDPOINTS))
 

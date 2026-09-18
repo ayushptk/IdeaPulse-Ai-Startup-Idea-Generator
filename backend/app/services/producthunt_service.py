@@ -8,7 +8,6 @@ Focuses on extracting pain points from product descriptions and comments.
 
 import logging
 from datetime import datetime, timezone
-from typing import List
 
 import httpx
 
@@ -130,7 +129,7 @@ async def _graphql(
     resp.raise_for_status()
     return resp.json()
 
-async def _fetch_posts(client: httpx.AsyncClient, token: str, limit: int) -> List[dict]:
+async def _fetch_posts(client: httpx.AsyncClient, token: str, limit: int) -> list[dict]:
     """Fetch the latest Product Hunt posts."""
     data = await _graphql(
         client, token, POSTS_QUERY,
@@ -139,7 +138,7 @@ async def _fetch_posts(client: httpx.AsyncClient, token: str, limit: int) -> Lis
     edges = data.get("data", {}).get("posts", {}).get("edges", [])
     return [edge["node"] for edge in edges if edge.get("node")]
 
-async def _fetch_comments(client: httpx.AsyncClient, token: str, post_id: str) -> List[str]:
+async def _fetch_comments(client: httpx.AsyncClient, token: str, post_id: str) -> list[str]:
     """Fetch top comments for a post to enrich the pain-point text."""
     try:
         data = await _graphql(
@@ -156,7 +155,7 @@ async def _fetch_comments(client: httpx.AsyncClient, token: str, post_id: str) -
         logger.debug(f"Product Hunt: failed to fetch comments for {post_id}: {e}")
         return []
 
-def _parse_product(product: dict, comments: List[str] | None = None) -> NormalizedPost | None:
+def _parse_product(product: dict, comments: list[str] | None = None) -> NormalizedPost | None:
     """Convert a Product Hunt node (+ optional comments) into a NormalizedPost."""
     name = product.get("name", "").strip()
     tagline = product.get("tagline", "").strip()
@@ -191,9 +190,9 @@ def _parse_product(product: dict, comments: List[str] | None = None) -> Normaliz
         url=product.get("url", ""),
     )
 
-async def fetch_producthunt_posts() -> List[NormalizedPost]:
+async def fetch_producthunt_posts() -> list[NormalizedPost]:
     """Main entry point — collects recent Product Hunt launches with comments."""
-    posts: List[NormalizedPost] = []
+    posts: list[NormalizedPost] = []
 
     async with httpx.AsyncClient(timeout=30.0) as client:
         try:
@@ -207,7 +206,7 @@ async def fetch_producthunt_posts() -> List[NormalizedPost]:
 
             for product in raw_products:
                 post_id = product.get("id", "")
-                comments: List[str] = []
+                comments: list[str] = []
 
                 if post_id and (product.get("commentsCount") or 0) > 0:
                     comments = await _fetch_comments(client, token, post_id)

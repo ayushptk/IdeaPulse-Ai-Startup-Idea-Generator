@@ -1,6 +1,5 @@
 
 import urllib.parse
-from typing import Optional
 
 import httpx
 from fastapi import APIRouter, Depends, HTTPException, Request
@@ -25,8 +24,8 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 class AuthPayload(BaseModel):
     email: str
-    name: Optional[str] = None
-    picture: Optional[str] = None
+    name: str | None = None
+    picture: str | None = None
     provider: str
     provider_id: str
 
@@ -53,10 +52,10 @@ class LoginPayload(BaseModel):
 
 
 class UpdateProfilePayload(BaseModel):
-    name: Optional[str] = None
-    email: Optional[EmailStr] = None
-    picture: Optional[str] = None
-    bio: Optional[str] = None
+    name: str | None = None
+    email: EmailStr | None = None
+    picture: str | None = None
+    bio: str | None = None
 
 
 @router.post("/verify")

@@ -10,7 +10,6 @@ In production, integrate with Proxycurl, PhantomBuster, or similar.
 
 import logging
 from datetime import datetime, timezone
-from typing import List
 
 import httpx
 
@@ -63,7 +62,7 @@ SEED_TOPICS = [
     },
 ]
 
-async def _fetch_via_proxycurl(client: httpx.AsyncClient) -> List[dict]:
+async def _fetch_via_proxycurl(client: httpx.AsyncClient) -> list[dict]:
     """
     Fetch LinkedIn posts via Proxycurl API (requires API key).
     Falls back gracefully if key is not configured.
@@ -84,7 +83,7 @@ async def _fetch_via_proxycurl(client: httpx.AsyncClient) -> List[dict]:
         logger.warning(f"LinkedIn Proxycurl fetch failed: {e}")
     return []
 
-async def _generate_dynamic_seed_topics() -> List[dict]:
+async def _generate_dynamic_seed_topics() -> list[dict]:
     """
     If no LinkedIn API key is provided, try to use Gemini to generate dynamic topics.
     If Gemini is unavailable or out of quota, generate random topics locally by mixing
@@ -178,13 +177,13 @@ async def _generate_dynamic_seed_topics() -> List[dict]:
         logger.warning(f"LinkedIn: Failed to generate dynamic topics via AI: {e}")
         return get_local_random_topics()
 
-async def fetch_linkedin_posts() -> List[NormalizedPost]:
+async def fetch_linkedin_posts() -> list[NormalizedPost]:
     """
     Main entry point — collects LinkedIn discussion data.
     Uses Proxycurl when available, otherwise generates dynamic seed data
     that represents real patterns seen on LinkedIn discussions.
     """
-    posts: List[NormalizedPost] = []
+    posts: list[NormalizedPost] = []
 
     async with httpx.AsyncClient(timeout=30.0) as client:
         api_posts = await _fetch_via_proxycurl(client)

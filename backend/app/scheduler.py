@@ -7,7 +7,6 @@ Default: all pipelines run daily at 6:00 AM UTC.
 
 import logging
 from datetime import datetime, timezone
-from typing import Optional
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
@@ -20,7 +19,7 @@ settings = get_settings()
 
 scheduler = AsyncIOScheduler()
 
-_last_run_at: Optional[datetime] = None
+_last_run_at: datetime | None = None
 _last_run_ideas: int = 0
 _last_run_status: str = "never"
 
@@ -100,7 +99,7 @@ def get_scheduler_status() -> dict:
     """
     now = datetime.now(timezone.utc)
 
-    next_run_iso: Optional[str] = None
+    next_run_iso: str | None = None
     countdown_seconds: int = 0
 
     if scheduler.running:

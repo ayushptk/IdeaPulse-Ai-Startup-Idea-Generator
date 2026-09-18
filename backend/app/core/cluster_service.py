@@ -6,7 +6,6 @@ coherent problem themes rather than scattered individual posts.
 """
 
 import logging
-from typing import List
 
 import numpy as np
 from sklearn.cluster import KMeans
@@ -31,7 +30,7 @@ def _determine_k(n_posts: int) -> int:
     k = max(3, min(int(np.sqrt(n_posts / 2)), MAX_CLUSTERS))
     return min(k, n_posts)  
 
-def cluster_posts(posts: List[NormalizedPost]) -> List[ClusterResult]:
+def cluster_posts(posts: list[NormalizedPost]) -> list[ClusterResult]:
     """
     Main entry point — clusters posts by topic similarity.
 
@@ -75,11 +74,11 @@ def cluster_posts(posts: List[NormalizedPost]) -> List[ClusterResult]:
     kmeans = KMeans(n_clusters=k, random_state=42, n_init=10, max_iter=300)
     labels = kmeans.fit_predict(tfidf_matrix)
 
-    clusters: dict[int, List[int]] = {}
+    clusters: dict[int, list[int]] = {}
     for idx, label in enumerate(labels):
         clusters.setdefault(label, []).append(idx)
 
-    results: List[ClusterResult] = []
+    results: list[ClusterResult] = []
     for cluster_id, indices in clusters.items():
         if len(indices) < MIN_CLUSTER_SIZE:
             continue  

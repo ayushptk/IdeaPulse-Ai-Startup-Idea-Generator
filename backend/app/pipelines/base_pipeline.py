@@ -8,7 +8,7 @@ This module implements the shared Store step and the orchestration template.
 """
 
 import logging
-from typing import Callable, Coroutine, List
+from collections.abc import Callable, Coroutine
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -26,7 +26,7 @@ settings = get_settings()
 
 async def store_ideas(
     session: AsyncSession,
-    ideas: List[GeneratedIdea],
+    ideas: list[GeneratedIdea],
     platform: str,
 ) -> int:
     """
@@ -66,7 +66,7 @@ async def store_ideas(
     return stored_count
 
 async def run_platform_pipeline(
-    fetch_fn: Callable[[], Coroutine[None, None, List[NormalizedPost]]],
+    fetch_fn: Callable[[], Coroutine[None, None, list[NormalizedPost]]],
     platform: str,
     session: AsyncSession,
 ) -> int:

@@ -8,7 +8,6 @@ Uses batch processing to minimize API calls and token usage.
 import asyncio
 import json
 import logging
-from typing import List
 
 from google import genai
 from google.genai import types
@@ -71,7 +70,7 @@ Be sharp, practical, and founder-level thinking.
 
 Return ONLY valid JSON."""
 
-def _build_user_prompt(clusters: List[ClusterResult], platform: str) -> str:
+def _build_user_prompt(clusters: list[ClusterResult], platform: str) -> str:
     """
     Build the user prompt from clusters.
     Batches multiple clusters into a single prompt to save API calls.
@@ -97,7 +96,7 @@ def _build_user_prompt(clusters: List[ClusterResult], platform: str) -> str:
 Generate 5 unique SaaS ideas based on the problems identified above.
 Return ONLY a valid JSON array — no markdown, no explanation, just the JSON."""
 
-def _build_linkedin_user_prompt(clusters: List[ClusterResult]) -> str:
+def _build_linkedin_user_prompt(clusters: list[ClusterResult]) -> str:
     """
     Build a LinkedIn-specific founder prompt from representative posts.
     Generates exactly 3 ideas with richer strategy-focused fields.
@@ -128,9 +127,9 @@ Each idea must include exactly these fields:
 Return ONLY a valid JSON array with exactly 3 objects."""
 
 async def generate_ideas(
-    clusters: List[ClusterResult],
+    clusters: list[ClusterResult],
     platform: str,
-) -> List[GeneratedIdea]:
+) -> list[GeneratedIdea]:
     """
     Generate SaaS ideas from clustered posts using Google Gemini.
 
@@ -192,7 +191,7 @@ async def generate_ideas(
         logger.exception(f"AI: Gemini API error for {platform}: {e}")
         return _generate_fallback_ideas(clusters, platform)
 
-def _parse_ai_response(raw_content: str) -> List[GeneratedIdea]:
+def _parse_ai_response(raw_content: str) -> list[GeneratedIdea]:
     """
     Parse and validate the AI response JSON.
     Handles both array responses and object-with-array responses.
@@ -239,8 +238,8 @@ def _parse_ai_response(raw_content: str) -> List[GeneratedIdea]:
         return []
 
 def _generate_fallback_ideas(
-    clusters: List[ClusterResult], platform: str
-) -> List[GeneratedIdea]:
+    clusters: list[ClusterResult], platform: str
+) -> list[GeneratedIdea]:
     """
     Fallback idea generation when Gemini is unavailable.
     Generates basic ideas from cluster data using heuristics.
@@ -273,7 +272,7 @@ def _generate_fallback_ideas(
 
     return ideas
 
-async def extract_linkedin_founder_ideas(post_text: str) -> List[LinkedInFounderIdea]:
+async def extract_linkedin_founder_ideas(post_text: str) -> list[LinkedInFounderIdea]:
     """
     Extract top 3 founder-style SaaS ideas from a single LinkedIn post text.
     Uses the user's requested strategy-focused prompt format.
@@ -346,7 +345,7 @@ Return ONLY a valid JSON array with exactly these keys per object:
         if not isinstance(parsed, list):
             return []
 
-        ideas: List[LinkedInFounderIdea] = []
+        ideas: list[LinkedInFounderIdea] = []
         for item in parsed[:3]:
             try:
                 ideas.append(LinkedInFounderIdea(**item))

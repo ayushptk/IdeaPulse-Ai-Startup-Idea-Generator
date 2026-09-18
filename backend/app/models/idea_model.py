@@ -4,7 +4,6 @@ Stores AI-generated SaaS ideas linked to their discovery platform.
 """
 
 import datetime
-from typing import List, Optional
 
 from sqlalchemy import DateTime, Float, Integer, String, Text, func
 from sqlalchemy.dialects.postgresql import JSONB
@@ -33,13 +32,13 @@ class Idea(Base):
     problem: Mapped[str] = mapped_column(Text, nullable=False)
     users: Mapped[str] = mapped_column(Text, nullable=False)
     idea: Mapped[str] = mapped_column(Text, nullable=False)
-    features: Mapped[Optional[List]] = mapped_column(JSONB, default=list)
+    features: Mapped[list | None] = mapped_column(JSONB, default=list)
     monetization: Mapped[str] = mapped_column(Text, nullable=False)
     score: Mapped[float] = mapped_column(Float, default=0.0, index=True)
 
-    source_text: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    engagement: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
-    content_hash: Mapped[Optional[str]] = mapped_column(
+    source_text: Mapped[str | None] = mapped_column(Text, nullable=True)
+    engagement: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    content_hash: Mapped[str | None] = mapped_column(
         String(64), unique=True, nullable=True, index=True,
         comment="SHA-256 of problem+idea to prevent duplicates"
     )

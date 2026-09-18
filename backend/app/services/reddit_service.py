@@ -20,7 +20,7 @@ import logging
 import re
 import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
-from typing import List, NamedTuple
+from typing import NamedTuple
 
 import httpx
 
@@ -69,7 +69,7 @@ class RedditEndpoint(NamedTuple):
     label: str          
     limit: int = 50
 
-REDDIT_ENDPOINTS: List[RedditEndpoint] = [
+REDDIT_ENDPOINTS: list[RedditEndpoint] = [
     
     RedditEndpoint(
         url="https://www.reddit.com/r/SaaS/hot.rss",
@@ -194,7 +194,7 @@ async def _warm_up_session(client: httpx.AsyncClient) -> None:
 async def _fetch_endpoint(
     client: httpx.AsyncClient,
     endpoint: RedditEndpoint,
-) -> List[dict]:
+) -> list[dict]:
     """Fetch raw post children from a single Reddit RSS endpoint."""
     separator = "&" if "?" in endpoint.url else "?"
     url = f"{endpoint.url}{separator}limit={endpoint.limit}"
@@ -317,7 +317,7 @@ def _parse_post(post: dict) -> NormalizedPost | None:
         url=f"https://reddit.com{data.get('permalink', '')}",
     )
 
-async def fetch_reddit_posts() -> List[NormalizedPost]:
+async def fetch_reddit_posts() -> list[NormalizedPost]:
     """
     Main entry point — fetches posts from all configured endpoints.
 
@@ -328,7 +328,7 @@ async def fetch_reddit_posts() -> List[NormalizedPost]:
       4. Deduplicate by URL
       5. Return up to MAX_POSTS_PER_FETCH posts, sorted by engagement desc
     """
-    all_posts: List[NormalizedPost] = []
+    all_posts: list[NormalizedPost] = []
     seen_urls: set[str] = set()
 
     async with httpx.AsyncClient(

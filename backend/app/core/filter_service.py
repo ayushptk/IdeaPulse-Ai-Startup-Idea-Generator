@@ -10,7 +10,6 @@ Applies multiple heuristics to drop noise before AI processing:
 
 import logging
 import re
-from typing import List, Set
 
 from app.config import get_settings
 from app.schemas import NormalizedPost
@@ -88,7 +87,7 @@ def _text_fingerprint(text: str) -> str:
     
     return cleaned[:100]
 
-def filter_posts(posts: List[NormalizedPost]) -> List[NormalizedPost]:
+def filter_posts(posts: list[NormalizedPost]) -> list[NormalizedPost]:
     """
     Main filter pipeline — applies all quality gates in sequence.
 
@@ -100,8 +99,8 @@ def filter_posts(posts: List[NormalizedPost]) -> List[NormalizedPost]:
         return []
 
     original_count = len(posts)
-    seen_fingerprints: Set[str] = set()
-    filtered: List[NormalizedPost] = []
+    seen_fingerprints: set[str] = set()
+    filtered: list[NormalizedPost] = []
 
     for post in posts:
         

@@ -10,7 +10,6 @@ Applies a weighted scoring formula that combines:
 
 import hashlib
 import logging
-from typing import List
 
 from app.schemas import GeneratedIdea
 
@@ -81,7 +80,7 @@ def _market_boost(idea: GeneratedIdea) -> float:
     matches = sum(1 for kw in MARKET_KEYWORDS if kw.lower() in combined)
     return min(matches * 0.15, 1.0)
 
-def score_ideas(ideas: List[GeneratedIdea]) -> List[GeneratedIdea]:
+def score_ideas(ideas: list[GeneratedIdea]) -> list[GeneratedIdea]:
     """
     Score and rank ideas using a weighted multi-factor formula.
 
@@ -94,7 +93,7 @@ def score_ideas(ideas: List[GeneratedIdea]) -> List[GeneratedIdea]:
     if not ideas:
         return []
 
-    scored: List[GeneratedIdea] = []
+    scored: list[GeneratedIdea] = []
     for idea in ideas:
         ai_score = idea.score
         specificity = _score_specificity(idea)

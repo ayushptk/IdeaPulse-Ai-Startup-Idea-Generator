@@ -10,7 +10,6 @@ In production, consider using Puppeteer/Playwright for dynamic content.
 
 import logging
 from datetime import datetime, timezone
-from typing import List
 
 import httpx
 
@@ -62,7 +61,7 @@ SEED_TOPICS = [
     },
 ]
 
-async def _scrape_ih_posts(client: httpx.AsyncClient) -> List[dict]:
+async def _scrape_ih_posts(client: httpx.AsyncClient) -> list[dict]:
     """
     Attempt to scrape Indie Hackers forum posts.
     Returns empty list if scraping fails (site may use heavy JS rendering).
@@ -86,12 +85,12 @@ async def _scrape_ih_posts(client: httpx.AsyncClient) -> List[dict]:
             logger.warning(f"Indie Hackers: scrape failed for {url}: {e}")
     return posts
 
-async def fetch_indiehackers_posts() -> List[NormalizedPost]:
+async def fetch_indiehackers_posts() -> list[NormalizedPost]:
     """
     Main entry point — collects Indie Hackers discussion data.
     Tries scraping first, falls back to curated seed data.
     """
-    posts: List[NormalizedPost] = []
+    posts: list[NormalizedPost] = []
 
     async with httpx.AsyncClient(timeout=30.0, follow_redirects=True) as client:
         scraped = await _scrape_ih_posts(client)
