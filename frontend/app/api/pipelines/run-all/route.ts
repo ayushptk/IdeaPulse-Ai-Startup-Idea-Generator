@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
+import { SERVER_API_URL } from '@/lib/api-config';
 
 export async function POST() {
-  const apiUrl = process.env.API_URL || 'http://127.0.0.1:8000/api/v1';
+  const apiUrl = SERVER_API_URL;
   const apiKey = process.env.INTERNAL_API_KEY || '';
 
   try {

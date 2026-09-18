@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { SERVER_API_URL } from "@/lib/api-config";
 
-const API_URL = process.env.API_URL || "http://127.0.0.1:8000/api/v1";
+const API_URL = SERVER_API_URL;
 const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY || "";
 
 export async function GET() {

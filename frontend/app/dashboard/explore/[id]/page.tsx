@@ -3,6 +3,7 @@
 import { useEffect, useState, ComponentType } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { SavedIdea } from "@/hooks/useSavedIdeas";
+import { PUBLIC_API_URL } from "@/lib/api-config";
 import {
   ArrowLeft,
   Bookmark,
@@ -153,8 +154,7 @@ export default function IdeaDetailPage() {
       setMounted(true);
     }, 0);
     if (!idea) {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/v1';
-      fetch(`${apiUrl}/ideas?limit=50`)
+      fetch(`${PUBLIC_API_URL}/ideas?limit=50`)
         .then((r) => r.json())
         .then((data) => {
           let all: SavedIdea[] = [];

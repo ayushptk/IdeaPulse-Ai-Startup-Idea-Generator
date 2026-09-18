@@ -12,6 +12,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { SavedIdea } from "@/hooks/useSavedIdeas";
+import { PUBLIC_API_URL } from "@/lib/api-config";
 
 const PLATFORM_META: Record<string, { label: string; color: string; bg: string; dot: string }> = {
   reddit:       { label: "Reddit",       color: "text-orange-400", bg: "bg-orange-400/8 border-orange-400/20",  dot: "bg-orange-400" },
@@ -70,8 +71,7 @@ export default function TrendingProblemsPage() {
   const [showSort, setShowSort] = useState(false);
 
   useEffect(() => {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/v1';
-    fetch(`${apiUrl}/ideas?limit=30`)
+    fetch(`${PUBLIC_API_URL}/ideas?limit=30`)
       .then((r) => r.json())
       .then((data) => {
         let all: SavedIdea[] = [];

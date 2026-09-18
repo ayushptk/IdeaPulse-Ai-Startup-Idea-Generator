@@ -1,9 +1,10 @@
 import NextAuth, { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { SERVER_API_URL } from "@/lib/api-config";
 
 // Use server-only API_URL — not NEXT_PUBLIC — so it is never bundled into the browser
-const API_URL = process.env.API_URL || "http://127.0.0.1:8000/api/v1";
+const API_URL = SERVER_API_URL;
 const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY || "";
 
 export const authOptions: NextAuthOptions = {

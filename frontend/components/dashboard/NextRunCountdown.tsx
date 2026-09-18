@@ -1,9 +1,9 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
 import { Clock, Zap, RefreshCw, CheckCircle, AlertCircle } from "lucide-react";
+import { PUBLIC_API_URL } from "@/lib/api-config";
 
-const _apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/v1';
-const API_BASE = _apiUrl.replace(/\/api\/v1\/?$/, '');
+const API_BASE = PUBLIC_API_URL.replace(/\/api\/v1\/?$/, '');
 
 interface SchedulerStatus {
   scheduler_running: boolean;

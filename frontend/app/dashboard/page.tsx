@@ -5,9 +5,9 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Sparkles, TrendingUp, Bookmark, ChevronUp, Share2, Compass, Activity, X } from 'lucide-react';
 import { useSavedIdeas, SavedIdea } from '@/hooks/useSavedIdeas';
+import { PUBLIC_API_URL } from '@/lib/api-config';
 
-const _apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/v1';
-const API_BASE = _apiUrl.replace(/\/api\/v1\/?$/, '');
+const API_BASE = PUBLIC_API_URL.replace(/\/api\/v1\/?$/, '');
 const categories = ['All Ideas', 'Reddit', 'ProductHunt', 'HackerNews', 'LinkedIn', 'IndieHackers'];
 
 const IdeaSkeleton = () => (
