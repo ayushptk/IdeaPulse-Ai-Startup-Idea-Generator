@@ -4,7 +4,9 @@ Uses pydantic-settings for type-safe, validated configuration.
 """
 
 from functools import lru_cache
+
 from pydantic_settings import BaseSettings
+
 
 class Settings(BaseSettings):
     """Central configuration — all values sourced from .env or environment."""
@@ -43,7 +45,7 @@ class Settings(BaseSettings):
 
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8", "extra": "ignore"}
 
-@lru_cache()
+@lru_cache
 def get_settings() -> Settings:
     """Cached singleton — avoids re-reading .env on every call."""
     return Settings()

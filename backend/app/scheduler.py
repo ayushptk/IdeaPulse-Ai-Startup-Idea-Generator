@@ -56,7 +56,7 @@ async def _run_all_pipelines_job():
                 total_ideas += count
                 logger.info(f"Scheduler: [{name}] generated {count} ideas")
             except Exception as e:
-                logger.error(f"Scheduler: [{name}] failed: {e}")
+                logger.exception(f"Scheduler: [{name}] failed: {e}")
 
     _last_run_at = datetime.now(timezone.utc)
     _last_run_ideas = total_ideas

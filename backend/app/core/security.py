@@ -5,8 +5,8 @@ All pipeline trigger endpoints and the /auth/update proxy require the
 INTERNAL_API_KEY header to prevent unauthenticated public access.
 """
 
-import secrets
 import logging
+import secrets
 
 from fastapi import HTTPException, Security
 from fastapi.security import APIKeyHeader

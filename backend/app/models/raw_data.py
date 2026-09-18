@@ -8,10 +8,12 @@ from typing import Optional
 from uuid import UUID
 
 from sqlalchemy import DateTime, ForeignKey, Integer, String, Text
-from sqlalchemy.dialects.postgresql import JSONB, UUID as pgUUID
+from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.dialects.postgresql import UUID as pgUUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database.db import Base
+
 
 class Platform(Base):
     """Represents a source platform (e.g., reddit, producthunt)."""

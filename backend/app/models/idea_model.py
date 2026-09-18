@@ -12,6 +12,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database.db import Base
 
+
 class Idea(Base):
     """
     Core entity — one row per generated SaaS idea.

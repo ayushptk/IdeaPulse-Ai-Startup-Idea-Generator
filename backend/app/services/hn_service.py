@@ -93,7 +93,7 @@ async def fetch_hn_posts() -> List[NormalizedPost]:
                 ids = await _fetch_feed_ids(client, feed)
                 logger.info(f"HN: feed '{feed}' returned {len(ids)} ids")
             except httpx.HTTPError as e:
-                logger.error(f"HN: feed '{feed}' fetch failed: {e}")
+                logger.exception(f"HN: feed '{feed}' fetch failed: {e}")
                 continue
 
             for item_id in ids[:max_per_feed]:

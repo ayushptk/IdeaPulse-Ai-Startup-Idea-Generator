@@ -5,11 +5,14 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api.auth import router as auth_router
 from app.config import get_settings
 from app.core.ai_service import extract_linkedin_founder_ideas
 from app.core.security import require_api_key
 from app.database.db import get_db
 from app.models.idea_model import Idea
+from app.models.saved_idea import SavedIdea
+from app.models.user import User
 from app.pipelines.hn_pipeline import run_hn_pipeline
 from app.pipelines.indie_pipeline import run_indie_pipeline
 from app.pipelines.linkedin_pipeline import run_linkedin_pipeline
@@ -17,21 +20,16 @@ from app.pipelines.producthunt_pipeline import run_producthunt_pipeline
 from app.pipelines.reddit_pipeline import run_reddit_pipeline
 from app.scheduler import get_scheduler_status
 from app.schemas import (
+    DeleteSavedIdeaRequest,
     HealthResponse,
     IdeaResponse,
     LinkedInExtractRequest,
     LinkedInFounderIdea,
     PipelineStatusResponse,
     PlatformIdeasResponse,
-    SchedulerStatusResponse,
     SaveIdeaRequest,
-    DeleteSavedIdeaRequest,
+    SchedulerStatusResponse,
 )
-
-from app.models.saved_idea import SavedIdea
-from app.models.user import User
-
-from app.api.auth import router as auth_router
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
@@ -160,7 +158,7 @@ async def get_platform_ideas(
             pipeline_fn = PLATFORM_PIPELINES[resolved]
             await pipeline_fn(db)
         except Exception as e:
-            logger.error(f"Pipeline [{resolved}] refresh failed: {e}")
+            logger.exception(f"Pipeline [{resolved}] refresh failed: {e}")
         result = await db.execute(
             select(Idea)
             .where(Idea.platform == platform_db_name)
@@ -315,202 +313,6 @@ async def trigger_pipeline(
             ideas_generated=0,
             message="Pipeline failed. Please try again later.",
         )
-
-@router.post(
-    "/pipelines/run-all",
-    response_model=list[PipelineStatusResponse],
-    tags=["Pipelines"],
-    summary="Trigger all platform pipelines",
-)
-async def trigger_all_pipelines(
-    db: AsyncSession = Depends(get_db),
-    _key: str = Depends(require_api_key),
-):
-    """
-    Retrieve the top-N highest-scored ideas for a given platform.
-
-    Supported platforms: reddit, producthunt, hn, linkedin, indie
-    """
-    resolved = _resolve_platform(platform)
-
-    if resolved not in PLATFORM_PIPELINES:
-        raise HTTPException(
-            status_code=404,
-            detail=f"Unknown platform '{platform}'. "
-                   f"Supported: {', '.join(PLATFORM_PIPELINES.keys())}",
-        )
-
-    platform_db_name = "indiehackers" if resolved == "indie" else resolved
-
-    result = await db.execute(
-        select(Idea)
-        .where(Idea.platform == platform_db_name)
-        .order_by(desc(Idea.created_at), desc(Idea.score))
-        .limit(limit)
-    )
-    ideas = result.scalars().all()
-
-    if refresh and not ideas:
-        try:
-            pipeline_fn = PLATFORM_PIPELINES[resolved]
-            await pipeline_fn(db)
-        except Exception as e:
-            logger.error(f"Pipeline [{resolved}] refresh failed: {e}")
-        result = await db.execute(
-            select(Idea)
-            .where(Idea.platform == platform_db_name)
-            .order_by(desc(Idea.created_at), desc(Idea.score))
-            .limit(limit)
-        )
-        ideas = result.scalars().all()
-
-    return PlatformIdeasResponse(
-        platform=resolved,
-        count=len(ideas),
-        ideas=[IdeaResponse.model_validate(idea) for idea in ideas],
-    )
-
-@router.get(
-    "/ideas",
-    response_model=list[PlatformIdeasResponse],
-    tags=["Ideas"],
-    summary="Get top ideas across all platforms",
-)
-async def get_all_ideas(
-    limit: int = Query(default=5, ge=1, le=50, description="Ideas per platform"),
-    db: AsyncSession = Depends(get_db),
-):
-    """Retrieve top ideas from every platform in a single response."""
-    all_platforms = []
-
-    for platform_slug in PLATFORM_PIPELINES:
-        platform_db_name = "indiehackers" if platform_slug == "indie" else platform_slug
-
-        result = await db.execute(
-            select(Idea)
-            .where(Idea.platform == platform_db_name)
-            .order_by(desc(Idea.created_at), desc(Idea.score))
-            .limit(limit)
-        )
-        ideas = result.scalars().all()
-
-        all_platforms.append(PlatformIdeasResponse(
-            platform=platform_slug,
-            count=len(ideas),
-            ideas=[IdeaResponse.model_validate(idea) for idea in ideas],
-        ))
-
-    return all_platforms
-
-@router.get(
-    "/ideas/hn/daily",
-    response_model=PlatformIdeasResponse,
-    tags=["Ideas"],
-    summary="Get today's 5 Hacker News SaaS ideas",
-)
-async def get_daily_hn_ideas(
-    db: AsyncSession = Depends(get_db),
-):
-    """
-    Return up to 5 ideas generated today from the HN pipeline.
-    If no ideas were generated today yet, falls back to latest 5 HN ideas.
-    """
-    utc_today_start = datetime.combine(
-        datetime.now(timezone.utc).date(),
-        time.min,
-        tzinfo=timezone.utc,
-    )
-
-    result = await db.execute(
-        select(Idea)
-        .where(Idea.platform == "hn", Idea.created_at >= utc_today_start)
-        .order_by(desc(Idea.created_at), desc(Idea.score))
-        .limit(5)
-    )
-    ideas = result.scalars().all()
-
-    if not ideas:
-        fallback_result = await db.execute(
-            select(Idea)
-            .where(Idea.platform == "hn")
-            .order_by(desc(Idea.created_at), desc(Idea.score))
-            .limit(5)
-        )
-        ideas = fallback_result.scalars().all()
-
-    return PlatformIdeasResponse(
-        platform="hn",
-        count=len(ideas),
-        ideas=[IdeaResponse.model_validate(idea) for idea in ideas],
-    )
-
-@router.post(
-    "/ideas/linkedin/extract",
-    response_model=list[LinkedInFounderIdea],
-    tags=["Ideas"],
-    summary="Extract top 3 founder-style SaaS ideas from LinkedIn post text",
-)
-async def extract_linkedin_ideas(
-    payload: LinkedInExtractRequest,
-    _key: str = Depends(require_api_key),
-):
-    """
-    Analyze one LinkedIn post with a founder/PMF-focused prompt and
-    return exactly the top 3 SaaS opportunities (when available).
-    Protected by X-API-Key to prevent unrestricted Gemini API cost abuse.
-    """
-    ideas = await extract_linkedin_founder_ideas(payload.post_text)
-    if not ideas:
-        raise HTTPException(
-            status_code=422,
-            detail="Could not extract ideas from the provided LinkedIn post text.",
-        )
-    return ideas
-
-@router.post(
-    "/pipelines/{platform}/run",
-    response_model=PipelineStatusResponse,
-    tags=["Pipelines"],
-    summary="Manually trigger a platform pipeline",
-)
-async def trigger_pipeline(
-    platform: str,
-    db: AsyncSession = Depends(get_db),
-    _key: str = Depends(require_api_key),
-):
-    """
-    Manually trigger the idea discovery pipeline for a specific platform.
-    Protected by X-API-Key — prevents unauthenticated Gemini cost abuse.
-    """
-    resolved = _resolve_platform(platform)
-
-    if resolved not in PLATFORM_PIPELINES:
-        raise HTTPException(
-            status_code=404,
-            detail=f"Unknown platform '{platform}'. "
-                   f"Supported: {', '.join(PLATFORM_PIPELINES.keys())}",
-        )
-
-    pipeline_fn = PLATFORM_PIPELINES[resolved]
-
-    try:
-        ideas_count = await pipeline_fn(db)
-        return PipelineStatusResponse(
-            platform=resolved,
-            status="success",
-            ideas_generated=ideas_count,
-            message=f"Pipeline completed. {ideas_count} new ideas generated.",
-        )
-    except Exception as e:
-        # Log internally with full details; return only a generic message to clients
-        logger.error(f"Pipeline [{resolved}] failed: {e}", exc_info=True)
-        return PipelineStatusResponse(
-            platform=resolved,
-            status="error",
-            ideas_generated=0,
-            message="Pipeline failed. Please try again later.",
-        )
-
 @router.post(
     "/pipelines/run-all",
     response_model=list[PipelineStatusResponse],
@@ -579,9 +381,8 @@ async def save_idea(
     
     try:
         await db.commit()
-    except Exception as e:
+    except Exception:
         await db.rollback()
-        pass
 
     return {"status": "success", "message": "Idea saved successfully"}
 

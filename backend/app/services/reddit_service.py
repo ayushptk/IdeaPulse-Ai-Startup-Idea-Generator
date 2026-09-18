@@ -17,12 +17,12 @@ passing data to the heavier NLP pipeline.
 
 import asyncio
 import logging
+import re
+import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
 from typing import List, NamedTuple
 
 import httpx
-import re
-import xml.etree.ElementTree as ET
 
 from app.config import get_settings
 from app.schemas import NormalizedPost
@@ -265,10 +265,10 @@ async def _fetch_endpoint(
         logger.warning(f"Reddit: timeout on {endpoint.label}")
         return []
     except httpx.HTTPError as e:
-        logger.error(f"Reddit: HTTP error on {endpoint.label}: {e}")
+        logger.exception(f"Reddit: HTTP error on {endpoint.label}: {e}")
         return []
     except Exception as e:
-        logger.error(f"Reddit: unexpected error on {endpoint.label}: {e}")
+        logger.exception(f"Reddit: unexpected error on {endpoint.label}: {e}")
         return []
 
 def _parse_post(post: dict) -> NormalizedPost | None:

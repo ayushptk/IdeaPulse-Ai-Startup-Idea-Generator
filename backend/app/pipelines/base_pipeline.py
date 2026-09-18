@@ -13,11 +13,11 @@ from typing import Callable, Coroutine, List
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.config import get_settings
 from app.core.ai_service import generate_ideas
 from app.core.cluster_service import cluster_posts
 from app.core.filter_service import filter_posts
 from app.core.scoring_service import generate_content_hash, score_ideas
-from app.config import get_settings
 from app.models.idea_model import Idea
 from app.schemas import GeneratedIdea, NormalizedPost
 
@@ -98,7 +98,7 @@ async def run_platform_pipeline(
             return 0
         logger.info(f"Pipeline [{platform}]: fetched {len(posts)} posts")
     except Exception as e:
-        logger.error(f"Pipeline [{platform}]: fetch failed: {e}")
+        logger.exception(f"Pipeline [{platform}]: fetch failed: {e}")
         return 0
 
     filtered = filter_posts(posts)

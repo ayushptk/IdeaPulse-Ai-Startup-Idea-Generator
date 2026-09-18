@@ -103,10 +103,10 @@ async def _get_access_token(client: httpx.AsyncClient) -> str | None:
             logger.error(f"Product Hunt: token response missing access_token: {token_data}")
         return _cached_token
     except httpx.HTTPStatusError as e:
-        logger.error(f"Product Hunt: OAuth token request failed {e.response.status_code}: {e.response.text}")
+        logger.exception(f"Product Hunt: OAuth token request failed {e.response.status_code}: {e.response.text}")
         return None
     except Exception as e:
-        logger.error(f"Product Hunt: OAuth token request error: {e}")
+        logger.exception(f"Product Hunt: OAuth token request error: {e}")
         return None
 
 async def _graphql(
@@ -219,9 +219,9 @@ async def fetch_producthunt_posts() -> List[NormalizedPost]:
             logger.info(f"Product Hunt: collected {len(posts)} normalized posts")
 
         except httpx.HTTPStatusError as e:
-            logger.error(f"Product Hunt API HTTP error {e.response.status_code}: {e.response.text[:300]}")
+            logger.exception(f"Product Hunt API HTTP error {e.response.status_code}: {e.response.text[:300]}")
         except httpx.HTTPError as e:
-            logger.error(f"Product Hunt API error: {e}")
+            logger.exception(f"Product Hunt API error: {e}")
         except Exception as e:
             logger.error(f"Product Hunt unexpected error: {e}", exc_info=True)
 

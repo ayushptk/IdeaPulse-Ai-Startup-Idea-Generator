@@ -5,9 +5,9 @@ Takes clustered problem themes and generates structured SaaS ideas.
 Uses batch processing to minimize API calls and token usage.
 """
 
+import asyncio
 import json
 import logging
-import asyncio
 from typing import List
 
 from google import genai
@@ -189,7 +189,7 @@ async def generate_ideas(
         return ideas
 
     except Exception as e:
-        logger.error(f"AI: Gemini API error for {platform}: {e}")
+        logger.exception(f"AI: Gemini API error for {platform}: {e}")
         return _generate_fallback_ideas(clusters, platform)
 
 def _parse_ai_response(raw_content: str) -> List[GeneratedIdea]:
@@ -234,7 +234,7 @@ def _parse_ai_response(raw_content: str) -> List[GeneratedIdea]:
         return ideas
 
     except json.JSONDecodeError as e:
-        logger.error(f"AI: failed to parse JSON response: {e}")
+        logger.exception(f"AI: failed to parse JSON response: {e}")
         logger.debug(f"AI: raw content: {raw_content[:500]}")
         return []
 
@@ -354,5 +354,5 @@ Return ONLY a valid JSON array with exactly these keys per object:
                 logger.warning(f"AI: skipping invalid LinkedIn founder idea: {e}")
         return ideas
     except Exception as e:
-        logger.error(f"AI: LinkedIn founder extraction failed: {e}")
+        logger.exception(f"AI: LinkedIn founder extraction failed: {e}")
         return []

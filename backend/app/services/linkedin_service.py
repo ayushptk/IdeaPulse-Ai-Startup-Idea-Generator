@@ -134,8 +134,9 @@ async def _generate_dynamic_seed_topics() -> List[dict]:
         return get_local_random_topics()
         
     try:
-        import json
         import asyncio
+        import json
+
         from google import genai
         from google.genai import types
         

@@ -6,7 +6,8 @@ Strict typing ensures data integrity across the entire pipeline.
 import datetime
 from typing import List, Optional
 
-from pydantic import BaseModel, Field, EmailStr
+from pydantic import BaseModel, EmailStr, Field
+
 
 class NormalizedPost(BaseModel):
     """

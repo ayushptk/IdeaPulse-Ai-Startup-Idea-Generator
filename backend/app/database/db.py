@@ -26,7 +26,6 @@ async_session_factory = async_sessionmaker(
 
 class Base(DeclarativeBase):
     """Declarative base for all ORM models."""
-    pass
 
 async def get_db() -> AsyncSession:
     """
@@ -46,7 +45,7 @@ async def get_db() -> AsyncSession:
 async def init_db() -> None:
     """Create all tables and seed initial data on startup."""
     async with engine.begin() as conn:
-        from app.models import Idea, Platform, RawPost, User, SavedIdea  # noqa: F401
+        from app.models import Idea, Platform, RawPost, SavedIdea, User  # noqa: F401
         await conn.run_sync(Base.metadata.create_all)
 
 async def close_db() -> None:

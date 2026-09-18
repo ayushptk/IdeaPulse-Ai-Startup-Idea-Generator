@@ -11,6 +11,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database.db import Base
 
+
 class SavedIdea(Base):
     """
     Stores an idea saved by a specific user.

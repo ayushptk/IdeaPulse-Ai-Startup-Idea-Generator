@@ -1,19 +1,19 @@
-from datetime import timezone, datetime
 
-from fastapi import APIRouter, Depends, HTTPException, Request
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
-from pydantic import BaseModel, EmailStr, Field, field_validator
-from typing import Optional
-from passlib.context import CryptContext
-import httpx
 import urllib.parse
+from typing import Optional
 
-from app.database.db import get_db
-from app.models.user import User
-from app.core.security import require_api_key
+import httpx
+from fastapi import APIRouter, Depends, HTTPException, Request
+from passlib.context import CryptContext
+from pydantic import BaseModel, EmailStr, Field, field_validator
 from slowapi import Limiter
 from slowapi.util import get_remote_address
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
+
+from app.core.security import require_api_key
+from app.database.db import get_db
+from app.models.user import User
 
 # Module-level limiter — shares the same key function as the app-level limiter in main.py
 limiter = Limiter(key_func=get_remote_address)
