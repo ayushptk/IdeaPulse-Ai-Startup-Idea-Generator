@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Sparkles, TrendingUp, Clock, Bookmark, ChevronUp, Share2, Compass, Activity, X } from 'lucide-react';
+import { Sparkles, TrendingUp, Bookmark, ChevronUp, Share2, Compass, Activity, X } from 'lucide-react';
 import { useSavedIdeas, SavedIdea } from '@/hooks/useSavedIdeas';
 
 const _apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/v1';
@@ -42,16 +42,7 @@ const TrendingSkeleton = () => (
   </div>
 );
 
-const FeedSkeleton = () => (
-  <div className="pb-5 border-b border-white/5 animate-pulse">
-    <div className="flex justify-between items-center mb-3">
-      <div className="w-10 h-4 bg-white/10 rounded"></div>
-      <div className="w-16 h-3 bg-white/10 rounded"></div>
-    </div>
-    <div className="w-full h-3 bg-white/10 rounded mb-2"></div>
-    <div className="w-3/4 h-3 bg-white/10 rounded"></div>
-  </div>
-);
+
 
 const PLATFORM_COLORS: Record<string, string> = {
   reddit: 'text-orange-400 bg-orange-400/10 border-orange-400/20',
@@ -61,16 +52,7 @@ const PLATFORM_COLORS: Record<string, string> = {
   indiehackers: 'text-indigo-400 bg-indigo-400/10 border-indigo-400/20',
 };
 
-const formatTimeAgo = (dateStr: string) => {
-  const date = new Date(dateStr);
-  const now = new Date();
-  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-  
-  if (diffInSeconds < 60) return `${diffInSeconds}s ago`;
-  if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
-  if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
-  return `${Math.floor(diffInSeconds / 86400)}d ago`;
-};
+
 
 export default function Dashboard() {
   const router = useRouter();

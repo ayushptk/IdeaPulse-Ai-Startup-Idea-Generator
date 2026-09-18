@@ -114,12 +114,18 @@ export const FallingText: React.FC<FallingTextProps> = ({
     const mouse = Mouse.create(containerRef.current);
     
     // Prevent Matter.js from stealing scroll/touch events
-    mouse.element.removeEventListener("wheel", (mouse as any).mousewheel);
-    mouse.element.removeEventListener("mousewheel", (mouse as any).mousewheel);
-    mouse.element.removeEventListener("DOMMouseScroll", (mouse as any).mousewheel);
-    mouse.element.removeEventListener("touchmove", (mouse as any).mousemove);
-    mouse.element.removeEventListener("touchstart", (mouse as any).mousedown);
-    mouse.element.removeEventListener("touchend", (mouse as any).mouseup);
+    // @ts-expect-error - Missing type definitions in @types/matter-js
+    mouse.element.removeEventListener("wheel", mouse.mousewheel);
+    // @ts-expect-error - mousewheel not in Matter.js types
+    mouse.element.removeEventListener("mousewheel", mouse.mousewheel);
+    // @ts-expect-error - mousewheel not in Matter.js types
+    mouse.element.removeEventListener("DOMMouseScroll", mouse.mousewheel);
+    // @ts-expect-error - mousemove not in Matter.js types
+    mouse.element.removeEventListener("touchmove", mouse.mousemove);
+    // @ts-expect-error - mousedown not in Matter.js types
+    mouse.element.removeEventListener("touchstart", mouse.mousedown);
+    // @ts-expect-error - mouseup not in Matter.js types
+    mouse.element.removeEventListener("touchend", mouse.mouseup);
 
     const mouseConstraint = MouseConstraint.create(engine, {
       mouse,

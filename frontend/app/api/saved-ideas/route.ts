@@ -5,7 +5,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 const API_URL = process.env.API_URL || "http://127.0.0.1:8000/api/v1";
 const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY || "";
 
-export async function GET(request: Request) {
+export async function GET() {
   const session = await getServerSession(authOptions);
   
   if (!session?.user?.email) {
@@ -26,7 +26,7 @@ export async function GET(request: Request) {
 
     const data = await res.json();
     return NextResponse.json(data);
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
@@ -60,7 +60,7 @@ export async function POST(request: Request) {
 
     const data = await res.json();
     return NextResponse.json(data);
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
@@ -93,7 +93,7 @@ export async function DELETE(request: Request) {
 
     const data = await res.json();
     return NextResponse.json(data);
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

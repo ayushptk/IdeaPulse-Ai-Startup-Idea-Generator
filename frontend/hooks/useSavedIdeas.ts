@@ -28,7 +28,7 @@ const getIdeaKey = (idea: SavedIdea): string =>
   idea.id ? String(idea.id) : encodeURIComponent(idea.problem?.slice(0, 60) || "unknown");
 
 export function useSavedIdeas() {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const [savedIdeas, setSavedIdeas] = useState<SavedIdea[]>([]);
   const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
   const [isLoading, setIsLoading] = useState(false);
@@ -87,7 +87,7 @@ export function useSavedIdeas() {
         }),
       });
       if (!res.ok) throw new Error("Failed to save");
-    } catch (e) {
+    } catch {
       // Revert optimistic update
       setSavedIdeas((prev) => prev.filter((s) => getIdeaKey(s) !== key));
       setSavedIds((prev) => {
@@ -120,7 +120,7 @@ export function useSavedIdeas() {
         body: JSON.stringify({ idea_key: key }),
       });
       if (!res.ok) throw new Error("Failed to unsave");
-    } catch (e) {
+    } catch {
       // Revert optimistic update
       setSavedIdeas(previousIdeas);
       setSavedIds(previousIds);
