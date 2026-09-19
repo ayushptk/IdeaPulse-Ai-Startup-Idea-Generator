@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import logoSrc from "@/public/logo.png";
 
 export function Footer() {
   return (
@@ -7,7 +8,7 @@ export function Footer() {
       <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-4 gap-8">
         <div className="col-span-1 md:col-span-2">
           <Link href="/" className="flex items-center gap-3 mb-4">
-            <Image src="/logo.png" alt="Logo" width={32} height={32} className="rounded-lg shadow-sm" unoptimized />
+            <Image src={logoSrc} alt="Logo" width={32} height={32} className="rounded-lg shadow-sm" unoptimized />
             <span className="font-bold text-lg tracking-tight text-white">IdeaForge AI</span>
           </Link>
           <p className="text-neutral-400 text-sm max-w-sm mb-6">
