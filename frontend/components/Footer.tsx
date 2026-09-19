@@ -6,10 +6,8 @@ export function Footer() {
     <footer className="border-t border-white/5 py-12 bg-black">
       <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-4 gap-8">
         <div className="col-span-1 md:col-span-2">
-          <Link href="/" className="flex items-center gap-2 mb-4">
-            <div className="">
-          <Image src="/logo.png" alt="Logo" width={20} height={20} />
-            </div>
+          <Link href="/" className="flex items-center gap-3 mb-4">
+            <Image src="/logo.png" alt="Logo" width={32} height={32} className="rounded-lg shadow-sm" />
             <span className="font-bold text-lg tracking-tight text-white">IdeaForge AI</span>
           </Link>
           <p className="text-neutral-400 text-sm max-w-sm mb-6">

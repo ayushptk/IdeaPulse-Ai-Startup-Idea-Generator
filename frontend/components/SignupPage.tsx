@@ -48,10 +48,10 @@ const SignupPage: React.FC = () => {
       <div className="w-full lg:w-1/2 flex flex-col justify-between p-8 sm:p-12 lg:p-16 xl:p-24 min-h-screen relative">
         
         {}
-        <div className="flex items-center gap-2 mb-12 sm:mb-16">
-          <Image src="/logo.png" alt="Logo" width={20} height={20} />
+        <Link href="/" className="flex items-center gap-3 mb-12 sm:mb-16 w-fit">
+          <Image src="/logo.png" alt="Logo" width={32} height={32} className="rounded-lg shadow-sm" />
           <span className="text-xl font-bold text-[#111111] tracking-tight">IdeaForge AI</span>
-        </div>
+        </Link>
 
         {}
         <div className="w-full h-full flex flex-col justify-center">
