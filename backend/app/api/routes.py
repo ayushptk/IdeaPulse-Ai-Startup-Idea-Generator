@@ -4,6 +4,8 @@ from datetime import datetime, time, timezone
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from cachetools import TTLCache
+from app.core.cache import async_cached
 
 from app.api.auth import router as auth_router
 from app.config import get_settings
@@ -98,6 +100,7 @@ async def get_scheduler_status_endpoint():
     tags=["Ideas"],
     summary="Get the most recently created ideas across all platforms",
 )
+@async_cached(TTLCache(maxsize=100, ttl=300))
 async def get_latest_ideas(
     limit: int = Query(default=20, ge=1, le=100, description="Number of latest ideas to return"),
     db: AsyncSession = Depends(get_db),
@@ -120,6 +123,7 @@ async def get_latest_ideas(
     tags=["Ideas"],
     summary="Get top ideas for a specific platform",
 )
+@async_cached(TTLCache(maxsize=100, ttl=300))
 async def get_platform_ideas(
     platform: str,
     limit: int = Query(default=5, ge=1, le=50, description="Number of ideas to return"),
@@ -179,6 +183,7 @@ async def get_platform_ideas(
     tags=["Ideas"],
     summary="Get top ideas across all platforms",
 )
+@async_cached(TTLCache(maxsize=10, ttl=300))
 async def get_all_ideas(
     limit: int = Query(default=5, ge=1, le=50, description="Ideas per platform"),
     db: AsyncSession = Depends(get_db),
@@ -211,6 +216,7 @@ async def get_all_ideas(
     tags=["Ideas"],
     summary="Get today's 5 Hacker News SaaS ideas",
 )
+@async_cached(TTLCache(maxsize=10, ttl=300))
 async def get_daily_hn_ideas(
     db: AsyncSession = Depends(get_db),
 ):

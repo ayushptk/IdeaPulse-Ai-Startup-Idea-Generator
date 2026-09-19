@@ -5,7 +5,7 @@ Stores AI-generated SaaS ideas linked to their discovery platform.
 
 import datetime
 
-from sqlalchemy import DateTime, Float, Integer, String, Text, func
+from sqlalchemy import DateTime, Float, Integer, String, Text, func, Index
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -26,6 +26,10 @@ class Idea(Base):
     """
 
     __tablename__ = "ideas"
+    __table_args__ = (
+        Index("ix_ideas_platform_created_score", "platform", "created_at", "score"),
+        Index("ix_ideas_created_score", "created_at", "score"),
+    )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     platform: Mapped[str] = mapped_column(String(50), index=True, nullable=False)
