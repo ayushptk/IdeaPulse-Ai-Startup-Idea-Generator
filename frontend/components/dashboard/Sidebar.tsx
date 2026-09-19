@@ -12,7 +12,7 @@ import {
   X
 } from 'lucide-react';
 import Image from 'next/image';
-import logoSrc from '@/public/logo.png';
+import logoSrc from '../../public/logo.png';
 import { useSidebar } from '@/hooks/useSidebar';
 
 const navItems = [

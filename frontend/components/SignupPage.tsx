@@ -7,7 +7,7 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { FcGoogle } from 'react-icons/fc';
 import Image from 'next/image';
-import logoSrc from '@/public/logo.png';
+import logoSrc from '../public/logo.png';
 import Link from 'next/link';
 
 const carouselData = [
