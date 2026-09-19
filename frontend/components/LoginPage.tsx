@@ -73,6 +73,7 @@ const LoginPage: React.FC = () => {
                   toast.error("Invalid email or password");
                 } else {
                   toast.success("Successfully logged in!");
+                  router.refresh();
                   router.push("/dashboard");
                 }
               } catch {

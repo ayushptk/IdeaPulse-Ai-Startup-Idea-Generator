@@ -78,6 +78,7 @@ const SignupPage: React.FC = () => {
                     password
                   });
                   if (!signInRes?.error) {
+                    router.refresh();
                     router.push("/dashboard");
                   } else {
                     router.push("/login");
