@@ -21,7 +21,7 @@ const securityHeaders = [
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com",
       // Allow images from known CDNs
-      "img-src 'self' data: blob: https://api.dicebear.com https://lh3.googleusercontent.com https://images.unsplash.com https://avatar.iran.liara.run",
+      "img-src 'self' data: blob: https://api.dicebear.com https://lh3.googleusercontent.com https://images.unsplash.com https://avatar.iran.liara.run https://*.vercel.app https://*.vercel-storage.com",
       // Allow connections to local backend and self (extract origin to allow sub-paths)
       `connect-src 'self' ${new URL(process.env.NEXT_PUBLIC_API_URL || "https://ideapulse-ai-startup-idea-generator.onrender.com").origin}`,
       "frame-ancestors 'none'",

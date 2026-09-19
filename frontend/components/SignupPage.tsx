@@ -51,7 +51,7 @@ const SignupPage: React.FC = () => {
 
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2.5 shrink-0">
-          <Image src="/logo.png" alt="Logo" width={28} height={28} className="rounded-lg shadow-sm" />
+          <Image src="/logo.png" alt="Logo" width={28} height={28} className="rounded-lg shadow-sm" unoptimized />
           <span className="text-lg font-bold text-[#111111] tracking-tight">IdeaForge AI</span>
         </Link>
 
