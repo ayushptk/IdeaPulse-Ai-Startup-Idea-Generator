@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import logoSrc from "../public/logo.png";
+const logoSrc = "/logo.png";
 
 export function Footer() {
   return (
